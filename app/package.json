@@ -1,0 +1,53 @@
+{
+    "name": "portainer-backup",
+    "version": "0.0.1",
+    "description": "Utility for scripting or scheduling scheduled backups for Portainer",
+    "keywords": [
+        "portainer",
+        "backup",
+        "docker",
+        "kubernetes",
+        "container"
+    ],
+    "homepage": "https://github.com/SavageSoftware/portainer-backup",
+    "bugs": "https://github.com/SavageSoftware/portainer-backup/issues",
+    "author": {
+        "name": "SavageSoftware, LLC.",
+        "url": "https://savagesoftware.com"
+    },
+    "repository": {
+        "type": "git",
+        "url": "https://github.com/SavageSoftware/portainer-backup.git"
+    },
+    "license": "Apache",
+    "main": "index.js",
+    "type": "module",
+    "bin": {
+        "portainer-backup": "index.js"
+    },
+    "scripts": {
+        "build": "npm install",
+        "help": "node index.js help",
+        "schedule": "node index.js schedule",
+        "backup": "node index.js backup",
+        "stacks": "node index.js stacks",
+        "info": "node index.js info",
+        "restore": "node index.js restore"
+    },
+    "dependencies": {
+        "axios": "^0.26.0",
+        "cli-table3": "^0.6.1",
+        "colors": "^1.4.0",
+        "death": "^1.1.0",
+        "dev-null": "^0.1.1",
+        "figlet": "^1.5.2",
+        "figures": "^4.0.0",
+        "gradient-string": "^2.0.0",
+        "log-symbols": "^5.1.0",
+        "node-cron": "^3.0.0",
+        "pretty-bytes": "^6.0.0",
+        "sanitize-filename": "^1.6.3",
+        "semver-parser": "^4.0.0",
+        "yargs": "^17.3.1"
+    }
+}
