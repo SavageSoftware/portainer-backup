@@ -33,7 +33,7 @@ A utility for scripting or scheduling Portainer backups.  This utility can backu
   * [Stacks](#stacks)
   * [Restore](#restore)
 * [Return Value](#return-value)
-* [Supported Command Line Options & Environment Variables](#supported-command-line-options--environment-variables)
+* [Command Line Options & Environment Variables](#command-line-options--environment-variables)
 * [Schedule Expression](#schedule-expression)
 * [Command Line Help](#command-line-help)
 
@@ -256,7 +256,7 @@ This utility will return a numeric value after the process exits.
 
 ---
 
-## Supported Command Line Options & Environment Variables
+## Command Line Options & Environment Variables
 
 This utility supports both command line arguments and environment variables for all configuration options.
 
@@ -352,6 +352,77 @@ For month and week day you also may use names or short names. e.g:
 
 ---
 
+## Filename & Directory Date/Time Substituions
+
+`Portainer-backup` supports a substituion syntax for dynamically assigning date and time elements to the `directory` and `filename` options.
+
+| Command Line Option | Environment Variable |
+| ------------------- | -------------------- |
+| `-d`, `--directory`, `--dir` | `PORTAINER_BACKUP_DIRECTORY` |
+| `-f`, `--filename` | `PORTAINER_BACKUP_FILENAME` |
+
+
+All substitution tokens are included in between double curly braces: `{{ TOKEN }}`
+
+Example:
+```
+  --filename "portainer-backup-{{DATE}}.tar.gz"
+```
+
+The folllowing substitions tokens are supported:
+
+| Token | Format | Example |
+| ----- | ------ | ------- |
+| `DATETIME`                    | `yyyy-MM-dd'T'HHmmss`      | 2022-03-05T231356 |
+| `TIMESTAMP`                   | `yyyyMMdd'T'HHmmss.SSSZZZ` |                   |
+| `DATE`                        | `yyyy-MM-dd`               | 2022-03-05        |
+| `TIME`                        | `HHmmss`                   | 231356            |
+| `ISO8601`                     | `TBD`                      | TBD         |
+| `ISO`                         | `TBD`                      | TBD         |
+| `ISO_BASIC`                   | `TBD`                      | TBD         |
+| `ISO_NO_OFFSET`               | `TBD`                      | TBD         |
+| `ISO_DATE`                    | `TBD`                      | TBD         |
+| `ISO_WEEKDATE`                | `TBD`                      | TBD         |
+| `ISO_TIME`                    | `TBD`                      | TBD         |
+| `TIME`                        | `TBD`                      | TBD         |
+| `RFC2822`                     | `TBD`                      | TBD         |
+| `HTTP`                        | `TBD`                      | TBD         |
+| `MILLIS`                      | `TBD`                      | TBD         |
+| `SECONDS`                     | `TBD`                      | TBD         |
+| `UNIX`                        | `TBD`                      | TBD         |
+| `EPOCH`                       | `TBD`                      | TBD         |
+| `LOCALE`                      | `TBD`                      | TBD         |
+| `LOCALE_DATE`                 | `TBD`                      | TBD         |
+| `LOCALE_TIME`                 | `TBD`                      | TBD         |
+| `DATE_SHORT`                  | `TBD`                      | TBD         |
+| `DATE_MED`                    | `TBD`                      | TBD         |
+| `DATE_FULL`                   | `TBD`                      | TBD         |
+| `DATE_HUGE`                   | `TBD`                      | TBD         |
+| `DATE_MED_WITH_WEEKDAY`       | `TBD`                      | TBD         |
+| `TIME_SIMPLE`                 | `TBD`                      | TBD         |
+| `TIME_WITH_SECONDS`           | `TBD`                      | TBD         |
+| `TIME_WITH_SHORT_OFFSET`      | `TBD`                      | TBD         |
+| `TIME_WITH_LONG_OFFSET`       | `TBD`                      | TBD         |
+| `TIME_24_SIMPLE`              | `TBD`                      | TBD         |
+| `TIME_24_WITH_SECONDS`        | `TBD`                      | TBD         |
+| `TIME_24_WITH_SHORT_OFFSET`   | `TBD`                      | TBD         |
+| `TIME_24_WITH_LONG_OFFSET`    | `TBD`                      | TBD         |
+| `DATETIME_SHORT`              | `TBD`                      | TBD         |
+| `DATETIME_MED`                | `TBD`                      | TBD         |
+| `DATETIME_FULL`               | `TBD`                      | TBD         |
+| `DATETIME_HUGE`               | `TBD`                      | TBD         |
+| `DATETIME_SHORT_WITH_SECONDS` | `TBD`                      | TBD         |
+| `DATETIME_MED_WITH_SECONDS`   | `TBD`                      | TBD         |
+| `DATETIME_FULL_WITH_SECONDS`  | `TBD`                      | TBD         |
+| `DATETIME_HUGE_WITH_SECONDS`  | `TBD`                      | TBD         |
+
+
+`Portainer-backup` uses the [Luxon](https://moment.github.io) library for parting date and time syntax.  Please see https://moment.github.io/luxon/#/formatting for more information.
+
+All date and times are rendered in the local date/time of the system running the `Portainer-backup` utility. Alternately you can incude the `UTC_` prefix in front of any of the tokens above to use UTC time instead.
+
+---
+
 ## Command Line Help
 
 Use the `help` command or `--help` option to see a listing of command line options directly via the CLI.
@@ -363,7 +434,7 @@ Use the `help` command or `--help` option to see a listing of command line optio
  |_| \___/_|  \__\__,_|_|_||_\___|_|   |___/\__,_\__|_\_\\_,_| .__/
                                                              |_|   
 ┌──────────────────────────────────────────────────────────────────┐
-│   Made with ♥ by SavageSoftware, LLC © 2022    (Version 0.0.1)   │
+│   Made with ♥ by SavageSoftware, LLC © 2022    (Version 0.0.5)   │
 └──────────────────────────────────────────────────────────────────┘
 
 Usage: <command> [(options...)]
