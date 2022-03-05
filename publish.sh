@@ -14,24 +14,25 @@
 #  -------------------------------------------------------------------
 #
 #  This script compiles and builds the current project sources into
-#  a Docker container image for the local build platform/environment.
+#  a Docker container image for ARM64 and x86_64 platforms.  Next,
+#  the script publishes the Docker images, publishes the project
+#  to the NPM registry.
 #
 # *********************************************************************
 #       COPYRIGHT SAVAGESOFTWARE,LLC, @ 2022, ALL RIGHTS RESERVED
 # *********************************************************************
 
-# GET VERSION FROM PACKAGE.JSON
-VERSION=$(node -p -e "require('./package.json').version")
+# BUMP VERSION IN PACKAGE.JSON
+npm version patch
 
-# ------------------------------------------------
-# BUILD DOCKER CONTAINER
-# ------------------------------------------------
+# BUILD AND PUSH DOCKER IMAGES TO: DockerHub
+# https://hub.docker.com/repository/docker/savagesoftware/portainer-backup
+./build.sh --push
 
-# perform docker image build on local system
-# (https://hub.docker.com/repository/docker/savagesoftware/portainer-backup)
-docker build \
-  --build-arg BUILDDATE="$(date -u +'%Y-%m-%dT%H:%M:%SZ')" \
-  --build-arg VERSION="$VERSION"     \
-  --tag savagesoftware/portainer-backup:$VERSION \
-  --tag savagesoftware/portainer-backup:latest   \
-  . $@
+# PUSH README.MD TO: DockerHub 
+# https://hub.docker.com/repository/docker/savagesoftware/portainer-backup
+docker pushrm savagesoftware/portainer-backup 
+
+# PUBLISH TO: NPM REGISTRY 
+# https://www.npmjs.com/package/portainer-backup
+npm publish  

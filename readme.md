@@ -11,7 +11,7 @@
 
 A utility for scripting or scheduling Portainer backups.  This utility can backup the entire Portainer database, optionally protect the archive file with a password and can additionally backup the `docker-compose` files for stacks created in the Portainer web interface.
 
-![SCREENSHOT](./app/screenshot.jpg)
+![SCREENSHOT](https://github.com/SavageSoftware/portainer-backup/raw/master/assets/screenshot.jpg)
 
 [![NPM](https://nodei.co/npm/portainer-backup.png?downloads=true&downloadRank=false&stars=false)](https://www.npmjs.com/package/portainer-backup)
 

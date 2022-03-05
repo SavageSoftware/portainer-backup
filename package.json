@@ -2,7 +2,7 @@
     "name": "portainer-backup",
     "version": "0.0.4",
     "description": "Utility for scripting or scheduling scheduled backups for Portainer",
-    "readme": "../README.md",
+    "readme": "README.md",
     "keywords": [
         "portainer",
         "backup",
@@ -24,16 +24,17 @@
     "main": "index.js",
     "type": "module",
     "bin": {
-        "portainer-backup": "index.js"
+        "portainer-backup": "src/index.js"
     },
     "scripts": {
+        "start": "node src/index.js",
         "build": "npm install",
-        "help": "node index.js help",
-        "schedule": "node index.js schedule",
-        "backup": "node index.js backup",
-        "stacks": "node index.js stacks",
-        "info": "node index.js info",
-        "restore": "node index.js restore"
+        "help": "node src/index.js help",
+        "schedule": "node src/index.js schedule",
+        "backup": "node src/index.js backup",
+        "stacks": "node src/index.js stacks",
+        "info": "node src/index.js info",
+        "restore": "node src/index.js restore"
     },
     "dependencies": {
         "axios": "^0.26.0",
@@ -46,7 +47,6 @@
         "gradient-string": "^2.0.0",
         "log-symbols": "^5.1.0",
         "luxon": "^2.3.1",
-        "moment": "^2.29.1",
         "node-cron": "^3.0.0",
         "pretty-bytes": "^6.0.0",
         "sanitize-filename": "^1.6.3",

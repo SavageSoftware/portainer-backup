@@ -36,7 +36,7 @@ import { createRequire } from 'module';
 
 // use the require approach to obtain package.json
 const require = createRequire(import.meta.url);
-const pkg = require('./package.json');
+const pkg = require('../package.json');
 
 // create deafult context
 let context = {

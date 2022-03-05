@@ -46,10 +46,10 @@ LABEL org.label-schema.docker.cmd="docker run -it --rm --name portainer-backup -
 
 # INSTALL ADDITIONAL IMAGE DEPENDENCIES AND COPY APPLICATION TO IMAGE
 RUN apk update && apk add --no-cache tzdata
-RUN mkdir -p /app 
-COPY app/package.json /app
-COPY app/*.js /app
-WORKDIR /app
+RUN mkdir -p /portainer-backup/src
+COPY package.json /portainer-backup
+COPY src/*.js /portainer-backup/src
+WORKDIR /portainer-backup
 VOLUME "/backup"
 RUN npm install --silent
 
@@ -66,7 +66,7 @@ ENV PORTAINER_BACKUP_DRYRUN=false
 ENV PORTAINER_BACKUP_STACKS=false
 
 # NODEJS RUNNING THIS APPLICATION IS THE ENTRYPOINT
-ENTRYPOINT [ "/usr/local/bin/node", "index.js" ]
+ENTRYPOINT [ "/usr/local/bin/node", "/portainer-backup/src/index.js" ]
 
 # DEFAULT COMMAND (if none provided)
 CMD ["schedule"]
