@@ -19,9 +19,39 @@ A utility for scripting or scheduling Portainer backups.  This utility can backu
 
 ## TL;DR
 
+**NodeJS & NPM**
+
+Command to install `portainer-backup` using node's **NPM** command:
+
+```shell
+npm install --global portainer-backup   
+```
+
+Command to launch `portainer-backup` after installing with NPM to perform a `backup` of your portainer server:
+
+```shell
+portainer-backup \
+  backup \
+  --url "http://portainer:9000" \
+  --token "PORTAINER_ACCESS_TOKEN" \
+  --directory $PWD/backup  
+```
+
+**NPX**
+
+Command to install & launch `portainer-backup` using node's [NPX](https://nodejs.dev/learn/the-npx-nodejs-package-runner) command to perform a `backup` of your portainer server:
+
+```shell
+npx portainer-backup \
+  backup \
+  --url "http://portainer:9000" \
+  --token "PORTAINER_ACCESS_TOKEN" \
+  --directory $PWD/backup  
+```
+
 **DOCKER**
 
-Command to launch `portainer-backup` using a Docker container to perform a `backup` of your portainer server.
+Command to launch `portainer-backup` using a Docker container to perform a `backup` of your portainer server:
 
 ```shell
 docker run -it --rm \
@@ -31,18 +61,6 @@ docker run -it --rm \
   --env PORTAINER_BACKUP_TOKEN="YOUR_ACCESS_TOKEN" \
   savagesoftware/portainer-backup:latest \
   backup
-```
-
-**NPX**
-
-Command to launch `portainer-backup` using node's [NPX](https://nodejs.dev/learn/the-npx-nodejs-package-runner) command to perform a `backup` of your portainer server.
-
-```shell
-npx portainer-backup \
-  backup \
-  --url "http://portainer:9000" \
-  --token "PORTAINER_ACCESS_TOKEN" \
-  --directory $PWD/backup  
 ```
 
 ---
