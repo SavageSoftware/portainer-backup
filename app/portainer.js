@@ -86,7 +86,7 @@ export class Portainer {
                 responseType: 'stream',
             };
 
-            // create request payload; include optional backup encryption password
+            // create request payload; include optional backup protection password
             let payload = {
                 password: (this.config.backup.password) ? this.config.backup.password : ""
             };

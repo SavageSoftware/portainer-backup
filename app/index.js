@@ -321,12 +321,12 @@ yargs(hideBin(process.argv))
     }
   })
 
-  // optional argument : password to use to encrypt/decrypt backup archive file (PORTAINER_BACKUP_PASSWORD)
+  // optional argument : password to use to protect backup archive file (PORTAINER_BACKUP_PASSWORD)
   .options({
     'p': {
       alias: ['password', 'pwd'],
       default: context.config.backup.password,
-      describe: 'Encryption/decryption password',
+      describe: 'Backup archive password',
       type: 'string',
       requiresArg: true,
       nargs: 1
@@ -750,7 +750,7 @@ function validateBackupFile(context){
             file: context.config.backup.file,
             filename: context.config.backup.filename,
             directory: context.config.backup.directory,
-            encrypted: (context.config.backup.password) ? true : false,
+            protected: (context.config.backup.password) ? true : false,
             status: "pending"
         }
 

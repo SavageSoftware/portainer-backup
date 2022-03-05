@@ -1,0 +1,47 @@
+# *********************************************************************
+#    ___   ___   ___   ___ ___                
+#   / __| /_\ \ / /_\ / __| __|               
+#   \__ \/ _ \ V / _ \ (_ | _|                
+#   |___/_/_\_\_/_/_\_\___|___| ___   ___ ___ 
+#   / __|/ _ \| __|_   _\ \    / /_\ | _ \ __|
+#   \__ \ (_) | _|  | |  \ \/\/ / _ \|   / _| 
+#   |___/\___/|_|   |_|   \_/\_/_/ \_\_|_\___|
+# 
+#  -------------------------------------------------------------------
+#                         PORTAINER-BACKUP
+#          https://github.com/SavageSoftware/portainer-backup
+#  -------------------------------------------------------------------
+#
+#  This docker-compose script will create a new portainer-backup
+#  docker container to perform automated backups on a defined schedule.
+#
+#  Make sure to substitute your Portainer server URL and access token.
+#  Also map the backup volume to a valid path where you want the 
+#  backup files to be saved.
+#
+# *********************************************************************
+#       COPYRIGHT SAVAGESOFTWARE,LLC, @ 2022, ALL RIGHTS RESERVED
+# *********************************************************************
+version: '3.8'
+
+services:
+  portainer-backup:
+    container_name: portainer-backup
+    image: savagesoftware/portainer-backup:latest
+    hostname: portainer-backup
+    restart: unless-stopped
+    command: schedule
+    environment:
+      TZ: America/New_York
+      PORTAINER_BACKUP_URL: "http://portainer:9000"
+      PORTAINER_BACKUP_TOKEN: "PORTAINER_ACCESS_TOKEN"
+      PORTAINER_BACKUP_PASSWORD: ""
+      PORTAINER_BACKUP_OVERWRITE: 1
+      PORTAINER_BACKUP_SCHEDULE: "0 0 0 * * *"
+      PORTAINER_BACKUP_STACKS: 1
+      PORTAINER_BACKUP_DRYRUN: 0
+      PORTAINER_BACKUP_CONCISE: 1
+      PORTAINER_BACKUP_DIRECTORY: "/backup"
+      PORTAINER_BACKUP_FILENAME: "portainer-backup.tar.gz"
+    volumes:
+      - /var/backup:/backup

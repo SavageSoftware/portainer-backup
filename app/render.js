@@ -191,7 +191,7 @@ export class Render {
           ['PATH', Util.wrapFilePath(`${file}`, 55)],
           ['SIZE', prettyBytes(stats.size)],
           ['CREATED', stats.ctime.toString()],
-          ['ENCRYPTED', this.context.config.backup.password ? "ENCRYPTED (with password)" : "NOT ENCRYPTED"]
+          ['PROTECTED', this.context.config.backup.password ? "PROTECTED (with password)" : "NO PASSWORD"]
         );
 
         // print table to output stream
