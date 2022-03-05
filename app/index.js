@@ -747,22 +747,26 @@ function validateBackupFile(context){
 
         // copy backup info in results data
         context.results.backup = {
-            file: context.config.backup.file,
-            filename: context.config.backup.filename,
             directory: context.config.backup.directory,
             protected: (context.config.backup.password) ? true : false,
             status: "pending"
         }
 
+        // build backup filename string with all tokenized substitutions replaced
+        context.results.backup.filename = Util.processSubstitutions(context.config.backup.filename);
+
+        // construct backup file path using backup directory and backup filename
+        context.results.backup.file = path.resolve(context.results.backup.directory, context.results.backup.filename);
+
         // if file does not exists, then there is no overwrite conflict
-        if(context.config.dryRun && !fs.existsSync(context.config.backup.file)){
+        if(context.config.dryRun && !fs.existsSync(context.results.backup.file)){
             render.writeln(symbols.success + "  (DRY-RUN)");
             context.results.backup.status="dryrun";
             return resolve(context);
         }
 
         // if file does not exists, then there is no overwrite conflict
-        if(!fs.existsSync(context.config.backup.file)){
+        if(!fs.existsSync(context.results.backup.file)){
             render.writeln(symbols.success);
             context.results.backup.status="ready";
             return resolve(context);
@@ -793,7 +797,7 @@ function validateBackupFile(context){
         // if the file does already exist, then there is a conflict; error
         render.writeln(symbols.error);
         context.results.backup.status="already-exists";
-        let err = new Error(`Backup file [${Util.wrapFilePath(context.config.backup.file, 30)}] already exists.`);
+        let err = new Error(`Backup file [${Util.wrapFilePath(context.results.backup.file, 30)}] already exists.`);
         render.error(err, "The target backup data file already exists!", 
                           "Set the 'PORTAINER_BACKUP_OVERWRITE' environment varaiable to enable file overwriting.");
         return reject(err);
@@ -990,17 +994,19 @@ function portainerBackupData(context){
  * @returns Promise
  */
 function portainerSaveBackupData(context, response){
+
+
     render.write("Saving portainer data backup         ... ")
-    return portainer.saveBackup(response.data, context.config.backup.file)
+    return portainer.saveBackup(response.data, context.results.backup.file)
         .then((file)=>{
             render.writeln(symbols.success);
 
             render.writeln();
-            render.writeln(` ${figures.arrowRight}  ${context.config.backup.file} ... ${symbols.success}`)
+            render.writeln(` ${figures.arrowRight}  ${context.results.backup.file} ... ${symbols.success}`)
             render.writeln();
 
             // udpate backup rsults data
-            let stats = fs.statSync(context.config.backup.file);
+            let stats = fs.statSync(context.results.backup.file);
             context.results.backup.size = stats.size,
             context.results.backup.created = stats.ctime.toISOString(),
             context.results.backup.status = "saved";

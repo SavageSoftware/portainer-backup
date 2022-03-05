@@ -48,9 +48,6 @@ export class Configuration {
         this.quiet = Util.evalBool(process.env.PORTAINER_BACKUP_QUIET);
         this.json = Util.evalBool(process.env.PORTAINER_BACKUP_JSON);
         this.concise = Util.evalBool(process.env.PORTAINER_BACKUP_CONCISE);
-
-        // construct backup file path using backup directory and backup filename
-        this.backup.file = path.resolve(this.backup.directory, this.backup.filename);
     }
 
     /**

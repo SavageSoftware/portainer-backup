@@ -251,7 +251,7 @@ export class Render {
 
         // add backup filename to summary table (if backup file exists)
         if(context.operation === "backup"){
-            table.push(['DATA BACKUP FILE', context.config.backup.filename]);
+            table.push(['BACKUP FILE', context.results.backup.filename]);
         }
 
         // add stacks count to summary table (if any exist)
