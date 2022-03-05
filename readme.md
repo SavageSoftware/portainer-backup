@@ -29,7 +29,8 @@ docker run -it --rm \
   --volume $PWD/backup:/backup \
   --env PORTAINER_BACKUP_URL="http://portainer:9000" \
   --env PORTAINER_BACKUP_TOKEN="YOUR_ACCESS_TOKEN" \
-    savagesoftware/portainer-backup:latest backup
+  savagesoftware/portainer-backup:latest \
+  backup
 ```
 
 **NPX**
@@ -37,7 +38,8 @@ docker run -it --rm \
 Command to launch `portainer-backup` using node's [NPX](https://nodejs.dev/learn/the-npx-nodejs-package-runner) command to perform a `backup` of your portainer server.
 
 ```shell
-npx portainer-backup backup \
+npx portainer-backup \
+  backup \
   --url "http://portainer:9000" \
   --token "PORTAINER_ACCESS_TOKEN" \
   --directory $PWD/backup  
@@ -45,7 +47,7 @@ npx portainer-backup backup \
 
 ---
 
-## Prerequsites
+## Prerequisites
 
 This utility has only been tested on Portainer **v2.11.0** and later.
 
@@ -76,7 +78,8 @@ The `backup` operation will perform a single backup of the Portainer data from t
  
 The following NPX command will perform a `backup` of the Portainer data.
 ```shell
-npx portainer-backup backup \
+npx portainer-backup \
+  backup \
   --url "http://portainer:9000" \
   --token "PORTAINER_ACCESS_TOKEN" \
   --directory $PWD/backup \
@@ -94,7 +97,8 @@ docker run -it --rm \
   --env PORTAINER_BACKUP_PASSWORD=""  \
   --env PORTAINER_BACKUP_OVERWRITE=true  \
   --env PORTAINER_BACKUP_DIRECTORY=/backup \
-    savagesoftware/portainer-backup:latest backup
+  savagesoftware/portainer-backup:latest \
+  backup
 ``` 
 
 ### Test
@@ -103,13 +107,14 @@ The `test` operation will perform a single backup of the Portainer data from the
  
 The following NPX command will perform a `test` of the Portainer data.
 ```shell
-npx portainer-backup test \
+npx portainer-backup \
+  test \
   --url "http://portainer:9000" \
   --token "PORTAINER_ACCESS_TOKEN" \
   --directory $PWD/backup
 ``` 
 
-The following docker command will perform a `backup` of the Portainer data.
+The following docker command will perform a `test` of the Portainer data.
 ```shell
 docker run -it --rm \
   --name portainer-backup \
@@ -117,10 +122,9 @@ docker run -it --rm \
   --env TZ="America/New_York" \
   --env PORTAINER_BACKUP_URL="http://portainer:9000" \
   --env PORTAINER_BACKUP_TOKEN="PORTAINER_ACCESS_TOKEN" \
-  --env PORTAINER_BACKUP_PASSWORD=""  \
-  --env PORTAINER_BACKUP_OVERWRITE=true  \
   --env PORTAINER_BACKUP_DIRECTORY=/backup \
-    savagesoftware/portainer-backup:latest backup
+  savagesoftware/portainer-backup:latest \
+  test
 ``` 
 
 
@@ -130,7 +134,8 @@ The `schedule` operation will perform continious scheduled backups of the Portai
  
 The following NPX command will perform a `test` of the Portainer data.
 ```shell
-npx portainer-backup schedule \
+npx portainer-backup \
+  schedule \
   --url "http://portainer:9000" \
   --token "PORTAINER_ACCESS_TOKEN" \
   --directory $PWD/backup \
@@ -138,7 +143,7 @@ npx portainer-backup schedule \
   --schedule "0 0 0 * * *"
 ``` 
 
-The following docker command will perform a `backup` of the Portainer data.
+The following docker command will perform a `schedule` of the Portainer data.
 ```shell
 docker run -it --rm \
   --name portainer-backup \
@@ -150,7 +155,8 @@ docker run -it --rm \
   --env PORTAINER_BACKUP_OVERWRITE=true  \
   --env PORTAINER_BACKUP_DIRECTORY=/backup \
   --env PORTAINER_BACKUP_SCHEDULE="0 0 0 * * *" \
-    savagesoftware/portainer-backup:latest backup
+  savagesoftware/portainer-backup:latest \
+  schedule
 ``` 
 
 ### Info
@@ -167,7 +173,8 @@ The following docker command will perform a `info` request from the Portainer da
 docker run -it --rm \
   --name portainer-backup \
   --env PORTAINER_BACKUP_URL="http://portainer:9000" \
-    savagesoftware/portainer-backup:latest info
+  savagesoftware/portainer-backup:latest \
+  info
 ``` 
 
 ---
