@@ -1,5 +1,7 @@
 [![Docker](https://img.shields.io/docker/v/savagesoftware/portainer-backup/latest?color=darkgreen&logo=docker&label=DockerHub%20Latest%20Image)](https://hub.docker.com/repository/docker/savagesoftware/portainer-backup/)
-[![NPM](https://img.shields.io/npm/v/portainer-backup?color=darkgreen&logo=npm&label=NPM%20Registry)](https://hub.docker.com/r/savagesoftware/portainer-backup)
+[![NPM](https://img.shields.io/npm/v/portainer-backup?color=darkgreen&logo=npm&label=NPM%20Registry)](https://www.npmjs.com/package/portainer-backup)
+[![GitHub package.json version](https://img.shields.io/github/package-json/v/savagesoftware/portainer-backup?color=darkgreen&label=GitHub%20Source)](https://github.com/SavageSoftware/portainer-backup)
+[![node-current](https://img.shields.io/node/v/portainer-backup)](https://www.npmjs.com/package/portainer-backup)
 
 # Portainer Backup
 
@@ -75,6 +77,16 @@ You will need to obtain a [Portiner Access Token](https://docs.portainer.io/v/ce
 
 ---
 
+**Installation**
+
+Command to install `portainer-backup` using node's **NPM** command:
+
+```shell
+npm install --global portainer-backup   
+```
+
+---
+
 ## Supported Commands & Operations
 
 This utility requires a single command to execute one of the built in operations.
@@ -94,9 +106,9 @@ This utility requires a single command to execute one of the built in operations
 
 The `backup` operation will perform a single backup of the Portainer data from the specified server.  This backup file will be TAR.GZ archive and can optionally be protected with a password (`--password`).  The process will terminate immedately after the `backup` operation is complete.
  
-The following NPX command will perform a `backup` of the Portainer data.
+The following command will perform a `backup` of the Portainer data.
 ```shell
-npx portainer-backup \
+portainer-backup \
   backup \
   --url "http://portainer:9000" \
   --token "PORTAINER_ACCESS_TOKEN" \
@@ -123,9 +135,9 @@ docker run -it --rm \
 
 The `test` operation will perform a single backup of the Portainer data from the specified server.  With the `test` operation, no data will be saved on the filesystem.  The `test` operation is the same as using the `--dryrun` option.  The process will terminate immedately after the `test` operation is complete.
  
-The following NPX command will perform a `test` of the Portainer data.
+The following command will perform a `test` of the Portainer data.
 ```shell
-npx portainer-backup \
+portainer-backup \
   test \
   --url "http://portainer:9000" \
   --token "PORTAINER_ACCESS_TOKEN" \
@@ -150,9 +162,9 @@ docker run -it --rm \
 
 The `schedule` operation will perform continious scheduled backups of the Portainer data from the specified server.  The `--schedule` option or `PORTAINER_BACKUP_SCHEDULE` environment variable takes a cron-like string expression to define the backup schedule.  The process will run continiously unless a validation step fails immediately after startup.
  
-The following NPX command will perform a `test` of the Portainer data.
+The following command will perform a `test` of the Portainer data.
 ```shell
-npx portainer-backup \
+portainer-backup \
   schedule \
   --url "http://portainer:9000" \
   --token "PORTAINER_ACCESS_TOKEN" \
@@ -181,9 +193,9 @@ docker run -it --rm \
 
 The `info` operation will perform an information request to the specified Portainer server.  The process will terminate immedately after the `info` operation is complete.
  
-The following NPX command will perform a `info` from the Portainer server.
+The following command will perform a `info` from the Portainer server.
 ```shell
-npx portainer-backup info --url "http://portainer:9000"
+portainer-backup info --url "http://portainer:9000"
 ``` 
 
 The following docker command will perform a `info` request from the Portainer data.

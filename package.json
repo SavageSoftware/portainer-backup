@@ -20,6 +20,9 @@
         "type": "git",
         "url": "https://github.com/SavageSoftware/portainer-backup.git"
     },
+    "engines": {
+        "node": ">=16"
+    },    
     "license": "Apache",
     "main": "index.js",
     "type": "module",
