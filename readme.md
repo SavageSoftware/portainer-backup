@@ -77,7 +77,7 @@ You will need to obtain a [Portiner Access Token](https://docs.portainer.io/v/ce
 
 ---
 
-**Installation**
+## Installation
 
 Command to install `portainer-backup` using node's **NPM** command:
 
