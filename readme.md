@@ -235,7 +235,6 @@ Examples:
     0   0   0   *   *   *   Daily at 12:00am
     0   0   5   1   *   *   1st day of month @ 5:00am
     0 */15  0   *   *   *   Every 15 minutes
-
 ```
 
 ### Allowed field values
@@ -284,7 +283,7 @@ For month and week day you also may use names or short names. e.g:
 
 Use the `help` command or `--help` option to see a listing of command line options directly via the CLI.
 
-```shell
+```
   ___         _        _                ___          _             
  | _ \___ _ _| |_ __ _(_)_ _  ___ _ _  | _ ) __ _ __| |___  _ _ __ 
  |  _/ _ \ '_|  _/ _` | | ' \/ -_) '_| | _ \/ _` / _| / / || | '_ \
@@ -383,7 +382,6 @@ Schedule Expression Examples: (cron syntax)
     0 */15  0   *   *   *   Every 15 minutes
 
     Additional Examples @ https://github.com/node-cron/node-cron#cron-syntax
-
 ```
 
 ---
