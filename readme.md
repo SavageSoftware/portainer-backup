@@ -69,6 +69,14 @@ docker run -it --rm \
 
 ## Prerequisites
 
+`Portainer-backup` requires the following prerequisites:
+
+| Prerequisite | Version | Link |
+| ------------ | ------- | -------- |
+| NodeJS       | v16 (LTS) | https://nodejs.org |
+| Portainer    | v2.11.0 (and newer) | https://www.portainer.io |
+| Portainer Access Token | N/A | https://docs.portainer.io/v/ce-2.11/api/access |
+
 This utility has only been tested on Portainer **v2.11.0** and later.
 
 > **NOTE:** If attempting to use with an older version of Portainer this utility will exit with an error message.  While it is untested, you can use the `--ignore-version` option to bypass the version validation/enforcement.
