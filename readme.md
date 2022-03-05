@@ -31,7 +31,7 @@ A utility for scripting or scheduling Portainer backups.  This utility can backu
   * [Schedule](#schedule)
   * [Info](#info)
   * [Stacks](#stacks)
-  * [Restore]](#restore)
+  * [Restore](#restore)
 * [Return Value](#return-value)
 * [Supported Command Line Options & Environment Variables](#supported-command-line-options--environment-variables)
 * [Schedule Expression](#schedule-expression)
