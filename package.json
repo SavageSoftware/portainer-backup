@@ -1,6 +1,6 @@
 {
     "name": "portainer-backup",
-    "version": "0.0.4",
+    "version": "0.0.5",
     "description": "Utility for scripting or scheduling scheduled backups for Portainer",
     "readme": "README.md",
     "keywords": [
