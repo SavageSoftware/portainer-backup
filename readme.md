@@ -19,6 +19,26 @@ A utility for scripting or scheduling Portainer backups.  This utility can backu
 
 ---
 
+## Table of Contents
+
+* [Overview](#overview)
+* [TL;DR](#tldr)
+* [Prerequisites](#prerequisites)
+* [Installation](#installation)
+* [Supported Commands & Operations](#supported-commands--operations)
+  * [Backup](#backup)
+  * [Test](#test)
+  * [Schedule](#schedule)
+  * [Info](#info)
+  * [Stacks](#stacks)
+  * [Restore]](#restore)
+* [Return Value](#return-value)
+* [Supported Command Line Options & Environment Variables](#supported-command-line-options--environment-variables)
+* [Schedule Expression](#schedule-expression)
+* [Command Line Help](#command-line-help)
+
+---
+
 ## TL;DR
 
 **NodeJS & NPM**
@@ -101,12 +121,12 @@ This utility requires a single command to execute one of the built in operations
 
 | Command    | Description |
 | ---------- | ----------- |
-| `backup`   | Backup portainer data archive    |
-| `schedule` | Run scheduled portainer backups  |
-| `stacks`   | Backup portainer stacks          |
-| `test`     | Test backup (no files are saved) |
-| `info`     | Get portainer server info        |
-| `restore`  | Restore portainer data           |
+| [`backup`](#backup)     | Backup portainer data archive    |
+| [`schedule`](#schedule) | Run scheduled portainer backups  |
+| [`stacks`](#stacks)     | Backup portainer stacks          |
+| [`test`](#test)         | Test backup (no files are saved) |
+| [`info`](#info)         | Get portainer server info        |
+| [`restore`](#restore)   | Restore portainer data           |
 
 > **NOTE:** The `restore` command is not currently implemented due to issues with the Portainer API.
 
@@ -214,6 +234,14 @@ docker run -it --rm \
   savagesoftware/portainer-backup:latest \
   info
 ``` 
+
+### Stacks
+
+T.B.D.
+
+### Restore
+
+T.B.D.
 
 ---
 
