@@ -16,7 +16,10 @@ A utility for scripting or scheduling Portainer backups.  This utility can backu
 
 ![SCREENSHOT](https://github.com/SavageSoftware/portainer-backup/raw/master/assets/screenshot.jpg)
 
-[![NPM](https://nodei.co/npm/portainer-backup.png?downloads=true&downloadRank=false&stars=false)](https://www.npmjs.com/package/portainer-backup)
+| Resources | URL |
+| --- | --- |
+| DockerHub Image | https://hub.docker.com/repository/docker/savagesoftware/portainer-backup/ |
+| NPM Package Registry | https://www.npmjs.com/package/portainer-backup | 
 
 ---
 
@@ -119,6 +122,8 @@ Command to install **portainer-backup** using node's **NPM** command:
 ```shell
 npm install --global portainer-backup   
 ```
+
+[![NPM](https://nodei.co/npm/portainer-backup.png?downloads=true&downloadRank=false&stars=false)](https://www.npmjs.com/package/portainer-backup)
 
 ---
 
