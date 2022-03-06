@@ -403,6 +403,8 @@ The folllowing substition **presets** are defined by and supported in **portaine
 | `EPOCH`                       | `X`                              | 1492702320.000                  |
 
 The folllowing substition **presets** are provided my the [Luxon](https://moment.github.io) library and are supported in **portainer-backup**:
+(See the following Luxon docs for more information: https://moment.github.io/luxon/#/formatting?id=presets)
+
 (The following presets are using the October 14, 1983 at `13:30:23` as an example.)
 
 | Name                         | Description                                                        | Example in en_US                                             | Example in fr                                              |
@@ -433,6 +435,7 @@ The folllowing substition **presets** are provided my the [Luxon](https://moment
 ### Supported Tokens
 
 If one of the substitution presets does not meet your needs, you can build your own date/time string using the supported **tokens** listed below.
+(See the following Luxon docs for more information: https://moment.github.io/luxon/#/formatting?id=table-of-tokens)
 
 Example:
 
