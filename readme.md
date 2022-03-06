@@ -382,8 +382,8 @@ Filenames are also processed through a `sanitize` funtion whick will strip chara
 
 The folllowing substition **presets** are defined by and supported in **portainer-backup**:
 
-| Token | Description | Format | Example (US) |
-| ----- | ----------- | ------ | ------------ |
+| Token | Format | Example (US) |
+| ----- | ------ | ------------ |
 | `DATETIME`                    | `yyyy-MM-dd'T'HHmmss`            | 2022-03-05T231356               |
 | `TIMESTAMP`                   | `yyyyMMdd'T'HHmmss.SSSZZZ`       | 20220305T184827.445-0500        |
 | `DATE`                        | `yyyy-MM-dd`                     | 2022-03-05                      |
