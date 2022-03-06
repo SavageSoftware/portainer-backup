@@ -374,7 +374,7 @@ Example:
 
 **Portainer-backup** uses the [Luxon](https://moment.github.io) library for parting date and time syntax.  Please see https://moment.github.io/luxon/#/formatting for more information.
 
-All date and times are rendered in the local date/time of the system running the **portainer-backup** utility. Alternately you can incude the `UTC_` prefix in front of any of the tokens above to use UTC time instead.
+All date and times are rendered in the local date/time of the system running the **portainer-backup** utility. Alternatively you can incude the `UTC_` prefix in front of any of the tokens below to use UTC time instead.
 
 Filenames are also processed through a `sanitize` funtion whick will strip characters that are not supported in filename.  The `:` character is replaced with `_` and the `/` character is replaced with `-`.
 
