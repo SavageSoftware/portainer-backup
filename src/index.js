@@ -626,6 +626,58 @@ function finish(err){
     }
 }
 
+
+/**
+ * Validate configuration settings and environment conditions for backup 
+ * @param {*} context application context 
+ * @returns Promise
+ */
+ function prepareBackupFile(context){
+    return new Promise((resolve, reject) => {
+
+        try{
+            // copy backup info in results data
+            context.results.backup = {
+                directory: context.config.backup.directory,
+                filename: context.config.backup.filename,
+                protected: (context.config.backup.password) ? true : false,
+                status: "pending"
+            }
+
+            // validate overwrite of existing file
+            render.write("Prepare backup directory & files     ... ");
+
+            const pathParts = context.results.backup.directory.split(path.sep);
+            for(let index in pathParts){
+                pathParts[index] = Util.processSubstitutions(pathParts[index]);
+            }
+            context.results.backup.directory = path.resolve(pathParts.join(path.sep));
+            console.log(context.results.backup.directory);
+
+            // ensure directory exist; if not create it
+            if(!fs.existsSync(context.results.backup.directory))
+                fs.mkdirSync(context.results.backup.directory, { recursive: true });
+                        
+            // build backup filename string with all tokenized substitutions replaced
+            context.results.backup.filename = Util.processSubstitutions(context.results.backup.filename);
+            
+            // construct complete backup file path using backup directory and backup filename
+            context.results.backup.file = path.resolve(context.results.backup.directory, context.results.backup.filename);
+
+            // success
+            render.writeln(symbols.success);
+            return resolve(context);
+        }
+        catch(err){
+            render.writeln(symbols.error);
+            render.error(err, "Failed to prepare backup directory and file path!");    
+            return reject(err);
+        }
+    });
+}
+
+
+
 // ********************************************************************************************************
 // ********************************************************************************************************
 //                                            VALIDATION METHODS
@@ -638,7 +690,11 @@ function finish(err){
  * @returns Promise
  */
 function validate(context){
+
     return validateAccessToken(context)
+        .then(()=>{
+            return prepareBackupFile(context);
+        })
         .then(()=>{
             return validateBackupPath(context);
         })
@@ -662,7 +718,7 @@ function validate(context){
     return new Promise((resolve, reject) => {
 
         // validate access token for API authorization
-        render.write("Validating Schedule cron expression  ... ")
+        render.write("Validating schedule cron expression  ... ")
 
         if(cron.validate(context.config.backup.schedule)){
             render.writeln(symbols.success);
@@ -689,7 +745,7 @@ function validateAccessToken(context){
     return new Promise((resolve, reject) => {
 
         // validate access token for API authorization
-        render.write("Validating Portainer access token    ... ")
+        render.write("Validating portainer access token    ... ")
         if(context.config.portainer.token && 
            context.config.portainer.token != undefined && 
            context.config.portainer.token !== ""){
@@ -717,7 +773,7 @@ function validateBackupPath(context){
 
         // ensure backup path/directory exists
         render.write("Validating target backup directory   ... ")
-        if(fs.existsSync(context.config.backup.directory)){
+        if(fs.existsSync(context.results.backup.directory)){
             render.writeln(symbols.success);
             return resolve(context);
         }
@@ -742,21 +798,7 @@ function validateBackupPath(context){
 function validateBackupFile(context){
     return new Promise((resolve, reject) => {
         
-        // validate overwrite of existing file
-        render.write("Validating target backup file exists ... ")
-
-        // copy backup info in results data
-        context.results.backup = {
-            directory: context.config.backup.directory,
-            protected: (context.config.backup.password) ? true : false,
-            status: "pending"
-        }
-
-        // build backup filename string with all tokenized substitutions replaced
-        context.results.backup.filename = Util.processSubstitutions(context.config.backup.filename);
-
-        // construct backup file path using backup directory and backup filename
-        context.results.backup.file = path.resolve(context.results.backup.directory, context.results.backup.filename);
+        render.write("Validating target backup file        ... ")
 
         // if file does not exists, then there is no overwrite conflict
         if(context.config.dryRun && !fs.existsSync(context.results.backup.file)){
@@ -813,7 +855,7 @@ function validateBackupFile(context){
     return new Promise((resolve, reject) => {
 
         // validate portainer minimum supported version
-        render.write("Validating Portainer version         ... ")
+        render.write("Validating portainer version         ... ")
         if(compareSemVer(context.results.portainer.version, Portainer.MIN_VERSION) >= 0){
             render.writeln(`${symbols.success}  (${context.results.portainer.version})`);
             return resolve(context);

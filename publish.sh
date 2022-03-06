@@ -23,7 +23,7 @@
 # *********************************************************************
 
 # BUMP VERSION IN PACKAGE.JSON
-npm version patch
+#npm version patch
 
 # BUILD AND PUSH DOCKER IMAGES TO: DockerHub
 # https://hub.docker.com/repository/docker/savagesoftware/portainer-backup
