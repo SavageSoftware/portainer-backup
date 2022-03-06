@@ -2,6 +2,7 @@
 [![NPM](https://img.shields.io/npm/v/portainer-backup?color=darkgreen&logo=npm&label=NPM%20Registry)](https://www.npmjs.com/package/portainer-backup)
 [![GitHub package.json version](https://img.shields.io/github/package-json/v/savagesoftware/portainer-backup?color=darkgreen&label=GitHub%20Source)](https://github.com/SavageSoftware/portainer-backup)
 [![node-current](https://img.shields.io/node/v/portainer-backup)](https://www.npmjs.com/package/portainer-backup)
+[![portainer](https://img.shields.io/badge/Portainer-v2.11.0-darkgreen)](https://www.portainer.io/)
 
 # Portainer Backup
 
@@ -99,6 +100,9 @@ docker run -it --rm \
 | NodeJS       | v16 (LTS) | https://nodejs.org |
 | Portainer    | v2.11.0 (and newer) | https://www.portainer.io |
 | Portainer Access Token | N/A | https://docs.portainer.io/v/ce-2.11/api/access |
+
+[![node-current](https://img.shields.io/node/v/portainer-backup)](https://www.npmjs.com/package/portainer-backup)
+[![portainer](https://img.shields.io/badge/Portainer-v2.11.0-darkgreen)](https://www.portainer.io/)
 
 This utility has only been tested on Portainer **v2.11.0** and later.
 
