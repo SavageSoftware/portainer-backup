@@ -43,6 +43,7 @@ A utility for scripting or scheduling Portainer backups.  This utility can backu
   * [Supported Presets](#supported-presets)
   * [Supported Tokens](#supported-tokens)
 * [Command Line Help](#command-line-help)
+* [Docker Compose](#docker-compose)
 
 ---
 
@@ -164,7 +165,6 @@ docker run -it --rm \
   --env TZ="America/New_York" \
   --env PORTAINER_BACKUP_URL="http://portainer:9000" \
   --env PORTAINER_BACKUP_TOKEN="PORTAINER_ACCESS_TOKEN" \
-  --env PORTAINER_BACKUP_PASSWORD=""  \
   --env PORTAINER_BACKUP_OVERWRITE=true  \
   --env PORTAINER_BACKUP_DIRECTORY=/backup \
   savagesoftware/portainer-backup:latest \
@@ -221,7 +221,6 @@ docker run -it --rm \
   --env TZ="America/New_York" \
   --env PORTAINER_BACKUP_URL="http://portainer:9000" \
   --env PORTAINER_BACKUP_TOKEN="PORTAINER_ACCESS_TOKEN" \
-  --env PORTAINER_BACKUP_PASSWORD=""  \
   --env PORTAINER_BACKUP_OVERWRITE=true  \
   --env PORTAINER_BACKUP_DIRECTORY=/backup \
   --env PORTAINER_BACKUP_SCHEDULE="0 0 0 * * *" \
@@ -249,11 +248,35 @@ docker run -it --rm \
 
 ### Stacks
 
-T.B.D.
+The **stacks** operation will perform a single backup of the Portainer stacks `docker-compose` data from the specified server.   This operation does not backup the Portainer database/data files, only the stacks.   Alternatively you can include stacks backups in the **backup** operation using the `--stacks` option.  The process will terminate immedately after the **stacks** operation is complete.
+ 
+The following command will perform a **stacks** of the Portainer data.
+```shell
+portainer-backup \
+  backup \
+  --url "http://portainer:9000" \
+  --token "PORTAINER_ACCESS_TOKEN" \
+  --directory $PWD/backup \
+  --stacks
+``` 
+
+The following docker command will perform a **stacks** of the Portainer data.
+```shell
+docker run -it --rm \
+  --name portainer-backup \
+  --volume $PWD/backup:/backup \
+  --env TZ="America/New_York" \
+  --env PORTAINER_BACKUP_URL="http://portainer:9000" \
+  --env PORTAINER_BACKUP_TOKEN="PORTAINER_ACCESS_TOKEN" \
+  --env PORTAINER_BACKUP_OVERWRITE=true  \
+  --env PORTAINER_BACKUP_DIRECTORY=/backup \
+  savagesoftware/portainer-backup:latest \
+  stacks
+``` 
 
 ### Restore
 
-T.B.D.
+The **restore** operation is not implemented at this time.  We encountered trouble getting the Portainer **restore** API (https://app.swaggerhub.com/apis/portainer/portainer-ce/2.11.1#/backup/Restore) to work properly and are investigating this issue further.
 
 ---
 
@@ -280,6 +303,7 @@ T.B.D.
 | `-d`, `--directory`, `--dir`        | `PORTAINER_BACKUP_DIRECTORY`      | string      | Backup directory/path |
 | `-f`, `--filename`                  | `PORTAINER_BACKUP_FILENAME`       | string      | Backup filename |
 | `-p`, `--password`, `--pw`          | `PORTAINER_BACKUP_PASSWORD`       | string      | Backup archive password |
+| `-M`, `--mkdir`, `--make-directory` | `PORTAINER_BACKUP_MKDIR`          | true\|false | Create backup directory path |
 | `-o`, `--overwrite`                 | `PORTAINER_BACKUP_OVERWRITE`      | true\|false | Overwrite existing files |
 | `-s`, `--schedule`, `--sch`         | `PORTAINER_BACKUP_SCHEDULE`       | string      | Cron expression for scheduled backups |
 | `-i`, `--include-stacks`, `--stacks`| `PORTAINER_BACKUP_STACKS`         | true\|false | Include stack files in backup |
@@ -538,7 +562,7 @@ Use the `help` command or `--help` option to see a listing of command line optio
  |_| \___/_|  \__\__,_|_|_||_\___|_|   |___/\__,_\__|_\_\\_,_| .__/
                                                              |_|   
 ┌──────────────────────────────────────────────────────────────────┐
-│   Made with ♥ by SavageSoftware, LLC © 2022    (Version 0.0.5)   │
+│   Made with ♥ by SavageSoftware, LLC © 2022    (Version 0.0.6)   │
 └──────────────────────────────────────────────────────────────────┘
 
 Usage: <command> [(options...)]
@@ -570,6 +594,8 @@ Backup Options:  (applies only to 'backup' command)
   -p, --password, --pwd           Backup archive password [string] [default: ""]
   -o, --overwrite                 Overwrite existing files
                                                       [boolean] [default: false]
+  -M, --mkdir, --make-directory  Create backup directory path if needed
+                                                      [boolean] [default: false]
   -s, --schedule, --sch           Cron expression for scheduled backups
                                              [string] [default: "0 0 0 * * * *"]
   -i, --include-stacks, --stacks  Include stack files in backup
@@ -578,7 +604,8 @@ Backup Options:  (applies only to 'backup' command)
 Stacks Options:  (applies only to 'stacks' command)
   -d, --directory, --dir  Backup directory/path    [string] [default: "/backup"]
   -o, --overwrite         Overwrite existing files    [boolean] [default: false]
-
+  -M, --mkdir, --make-directory  Create backup directory path if needed
+                                                      [boolean] [default: false]
 Restore Options:  (applies only to 'restore' command)
   -p, --password, --pwd  Backup archive password          [string] [default: ""]
 

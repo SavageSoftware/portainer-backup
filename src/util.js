@@ -85,6 +85,17 @@ export default class Util {
         return (leadingSlash ? "/" : "") + res.join("\n");
     };   
     
+    /**
+     * Process file or directory string for named or tokenized substitutions
+     * Sanitize the name for any invalid filesystem characters.
+     * @param {*} name 
+     */
+     static hasSubstitutions(name){
+        // find any substitution replacements in file|directory name string
+        const substitutions = name.match(/\{\{.*?\}\}/g);
+        if(substitutions) return true;
+        return false;
+     }
     
     /**
      * Process file or directory string for named or tokenized substitutions

@@ -355,6 +355,17 @@ yargs(hideBin(process.argv))
     }
   })
 
+  // optional argument : include stack files in addition to backup 
+  // data archive file in a 'backup' opertation (PORTAINER_BACKUP_STACKS)
+  .options({
+    'M': {
+      alias: ['mkdir','make-directory',],
+      default: context.config.backup.stacks,
+      describe: 'Create backup directory path if needed',
+      type: 'boolean'
+    }
+  })
+
   // optional argument : the cron-like expression for scheduling 
   // automated 'backup' opertations (PORTAINER_BACKUP_SCHEDULE)
   .options({
@@ -370,8 +381,8 @@ yargs(hideBin(process.argv))
 
    // setup option groups
   .group(['t','u', 'Z'], 'Portainer Options:')
-  .group(['d','f','p','o','s','i'], "Backup Options:  (applies only to 'backup' command)")
-  .group(['d','o'], "Stacks Options:  (applies only to 'stacks' command)")
+  .group(['d','f','p','o','M','s','i'], "Backup Options:  (applies only to 'backup' command)")
+  .group(['d','o','M'], "Stacks Options:  (applies only to 'stacks' command)")
   .group(['p'], "Restore Options:  (applies only to 'restore' command)")
 
   // we always require a single command operation
@@ -396,17 +407,20 @@ function schedule(){
     if(!context.config.concise) render.configuration();
 
     // the following promise chain is responsible for 
-    // performing the complete backup workflow sequence.
-    validate(context)   // validate configuration and runtime environment
+    // performing the complete backup workflow sequence.    
+    initialize(context)                                     // initialize operation
+        .then((ctx)=>{
+            return portainerStatusCheck(context)            // check for access to portainer API/server
+        })
+        .then((ctx)=>{
+            return validatePortainerVersion(context);       // perform portainer version check
+        }) 
+        .then((ctx)=>{
+            return validateAccessToken(context);            // perform portainer access token check
+        })                    
         .then((ctx)=>{
             return validateSchedule(context);
         })
-        .then((ctx)=>{
-            return portainerStatusCheck(context)                    // check for access to portainer API/server
-        })
-        .then((ctx)=>{
-            return validatePortainerVersion(context);               // perform portainer version check
-        })            
         .then((ctx)=>{
             cron.schedule(context.config.backup.schedule, function() {
                 console.log('----------------------------------------------------------------------');
@@ -414,25 +428,31 @@ function schedule(){
                 console.log('----------------------------------------------------------------------');
                 console.log();
 
-                portainerBackupData(context)                        // perform portainer data backup 
+                validateBackupDirectory(context)                      // validate backup directory/path
+                    .then(()=>{
+                        return validateBackupFile(context)            // validate backup file
+                    })
+                    .then(()=>{
+                        return portainerBackupData(context)           // perform portainer data backup 
+                    })
                     .then((ctx)=>{
                         if(context.config.backup.stacks) 
-                            return portainerBackupStacks(context);  // perform portainer stacks backup (if needed)
+                            return portainerBackupStacks(context);    // perform portainer stacks backup (if needed)
                     }) 
                     .then((ctx)=>{        
                         finish();
                         if(!context.config.concise) 
-                            render.summary(context);                // display backup summary
+                            render.summary(context);                  // display backup summary
                         })    
                     .then((ctx)=>{
-                        if(context.config.dryRun) render.dryRun();  // display DRY-RUN message (if needed)
+                        if(context.config.dryRun) render.dryRun();    // display DRY-RUN message (if needed)
                     })    
                     .then((ctx)=>{
                         if(!context.config.concise) 
-                            render.success();                       // display backup complete message
+                            render.success();                         // display backup complete message
                         })    
                     .catch((err)=>{     
-                        if(context.config.debug) console.error(err);// debug ouput message (if needed)
+                        if(context.config.debug) console.error(err);  // debug ouput message (if needed)
                     })
                     .finally(() => {                                // finished
                         console.log('----------------------------------------------------------------------');
@@ -467,12 +487,21 @@ function backup(){
 
     // the following promise chain is responsible for 
     // performing the complete backup workflow sequence.
-    validate(context)   // validate configuration and runtime environment
+    initialize(context)                                     // initialize operation
+        .then(()=>{
+            return validateBackupDirectory(context);        // validate backup directory/path
+        })
+        .then(()=>{
+            return validateBackupFile(context)              // validate backup file
+        })
         .then((ctx)=>{
             return portainerStatusCheck(context)            // check for access to portainer API/server
         })
         .then((ctx)=>{
             return validatePortainerVersion(context);       // perform portainer version check
+        }) 
+        .then((ctx)=>{
+            return validateAccessToken(context);            // perform portainer access token check
         })            
         .then((ctx)=>{
             return portainerBackupData(context);            // perform portainer data backup 
@@ -514,18 +543,21 @@ function stacks(){
 
     // the following promise chain is responsible for 
     // performing the complete [STACKS] workflow sequence.
-    validateAccessToken(context)   // validate configuration and runtime environment
-        .then((ctx)=>{
-            return validateBackupPath(context)             // validate backup directory
+    initialize(context)                                     // initialize operation
+        .then(()=>{
+            return validateBackupDirectory(context);        // validate backup directory/path
         })
         .then((ctx)=>{
-            return portainerStatusCheck(context)           // check for access to portainer API/server
+            return portainerStatusCheck(context)            // check for access to portainer API/server
         })
         .then((ctx)=>{
-            return validatePortainerVersion(context);      // perform portainer version check
+            return validatePortainerVersion(context);       // perform portainer version check
         })            
         .then((ctx)=>{
-            return portainerBackupStacks(context);         // perform portainer stacks backup
+            return validateAccessToken(context);            // perform portainer access token check
+        })            
+        .then((ctx)=>{
+            return portainerBackupStacks(context);          // perform portainer stacks backup
         }) 
         .then((ctx)=>{        
             finish();
@@ -560,7 +592,10 @@ function info(){
 
     // the following promise chain is responsible for 
     // performing the complete [INFO] workflow sequence.
-    portainerStatusCheck(context)                          // validate configuration and runtime environment
+    initialize(context)                                    // initialize operation
+        .then(()=>{
+            return portainerStatusCheck(context);          // validate configuration and runtime environment
+        })
         .then((ctx)=>{
             return validatePortainerVersion(context);      // perform portainer version check
         })            
@@ -632,10 +667,13 @@ function finish(err){
  * @param {*} context application context 
  * @returns Promise
  */
- function prepareBackupFile(context){
+ function initialize(context){
     return new Promise((resolve, reject) => {
 
         try{
+            // initialize operation
+            render.write("Initializing operation             : ");
+            
             // copy backup info in results data
             context.results.backup = {
                 directory: context.config.backup.directory,
@@ -644,33 +682,13 @@ function finish(err){
                 status: "pending"
             }
 
-            // validate overwrite of existing file
-            render.write("Prepare backup directory & files     ... ");
-
-            const pathParts = context.results.backup.directory.split(path.sep);
-            for(let index in pathParts){
-                pathParts[index] = Util.processSubstitutions(pathParts[index]);
-            }
-            context.results.backup.directory = path.resolve(pathParts.join(path.sep));
-            console.log(context.results.backup.directory);
-
-            // ensure directory exist; if not create it
-            if(!fs.existsSync(context.results.backup.directory))
-                fs.mkdirSync(context.results.backup.directory, { recursive: true });
-                        
-            // build backup filename string with all tokenized substitutions replaced
-            context.results.backup.filename = Util.processSubstitutions(context.results.backup.filename);
-            
-            // construct complete backup file path using backup directory and backup filename
-            context.results.backup.file = path.resolve(context.results.backup.directory, context.results.backup.filename);
-
             // success
-            render.writeln(symbols.success);
+            render.writeln(`${symbols.success} ${context.operation.toUpperCase()}`);
             return resolve(context);
         }
         catch(err){
-            render.writeln(symbols.error);
-            render.error(err, "Failed to prepare backup directory and file path!");    
+            render.writeln(`${symbols.error} ${context.operation.toUpperCase()}`);
+            render.error(err, "Failed to initialize operation!");    
             return reject(err);
         }
     });
@@ -685,31 +703,6 @@ function finish(err){
 // ********************************************************************************************************
 
 /**
- * Validate configuration settings and environment conditions for backup 
- * @param {*} context application context 
- * @returns Promise
- */
-function validate(context){
-
-    return validateAccessToken(context)
-        .then(()=>{
-            return prepareBackupFile(context);
-        })
-        .then(()=>{
-            return validateBackupPath(context);
-        })
-        .then(()=>{
-            return validateBackupFile(context)
-        })
-        .then(()=>{
-            return Promise.resolve(context);
-        })
-        .catch((err)=>{                 
-            return Promise.reject(err);
-        })
-}
-
-/**
  * Validate the schedule (cron-like) expression for scheduled backups.
  * @param {*} context application context 
  * @returns Promise
@@ -718,8 +711,8 @@ function validate(context){
     return new Promise((resolve, reject) => {
 
         // validate access token for API authorization
-        render.write("Validating schedule cron expression  ... ")
-
+        render.write("Validating schedule expression     : ")
+        
         if(cron.validate(context.config.backup.schedule)){
             render.writeln(symbols.success);
             return resolve(context);
@@ -729,7 +722,8 @@ function validate(context){
         render.writeln(symbols.error);
         let err = new Error(`Invalid 'PORTAINER_BACKUP_SCHEDULE' cron expression: [${context.config.backup.schedule}]`)
         render.error(err, "Invalid schedule cron expression!", 
-                          "The 'PORTAINER_BACKUP_SCHEDULE' environment variable does not have a valid cron expression; " + 
+                          "The 'PORTAINER_BACKUP_SCHEDULE' environment variable or '--schedule' command "+ 
+                          "line option does not have a valid cron expression; " + 
                           "Please see the documention for more details on the schedule cron expression.");
         return reject(err);
     });
@@ -745,7 +739,7 @@ function validateAccessToken(context){
     return new Promise((resolve, reject) => {
 
         // validate access token for API authorization
-        render.write("Validating portainer access token    ... ")
+        render.write("Validating portainer access token  : ")
         if(context.config.portainer.token && 
            context.config.portainer.token != undefined && 
            context.config.portainer.token !== ""){
@@ -757,8 +751,9 @@ function validateAccessToken(context){
         render.writeln(symbols.error);
         let err = new Error("'PORTAINER_BACKUP_TOKEN' is missing!");
         render.error(err, "An API access token must be configured!", 
-                          "The 'PORTAINER_BACKUP_TOKEN' environment variable is missing; " + 
-                          "You can create an API token in portainer under your user acocunt / access tokens.");
+                          "The 'PORTAINER_BACKUP_TOKEN' environment variable or '--token' command line option is missing ; " + 
+                          "You can create an API token in portainer under your user acocunt / access tokens: " + 
+                          "https://docs.portainer.io/v/ce-2.11/api/access#creating-an-access-token");
         return reject(err);
     });
 }
@@ -768,22 +763,42 @@ function validateAccessToken(context){
  * @param {*} context application context 
  * @returns Promise
  */
-function validateBackupPath(context){
+function validateBackupDirectory(context){
     return new Promise((resolve, reject) => {
 
+        let createdDirectory = false;
+
+        // replace substitution tokens in backup directory string if needed
+        const pathParts = context.results.backup.directory.split(path.sep);
+        for(let index in pathParts){
+            pathParts[index] = Util.processSubstitutions(pathParts[index]);
+        }
+        context.results.backup.directory = path.resolve(pathParts.join(path.sep));
+
+        // ensure directory exist; if not create it
+        if(context.config.mkdir && !fs.existsSync(context.results.backup.directory)){
+            fs.mkdirSync(context.results.backup.directory, { recursive: true });
+            createdDirectory = true;
+        }
+
         // ensure backup path/directory exists
-        render.write("Validating target backup directory   ... ")
+        render.write("Validating target backup directory : ")
+
         if(fs.existsSync(context.results.backup.directory)){
-            render.writeln(symbols.success);
+            render.writeln(`${symbols.success} ${createdDirectory?"CREATED":"EXISTS"} ${figures.arrowRight} ${context.results.backup.directory}`);
             return resolve(context);
         }
 
         // backup path/directory does not exist; error
-        render.writeln(symbols.error);
+        render.writeln(`${symbols.error} ${context.results.backup.directory}`);
         let err = new Error("'PORTAINER_BACKUP_DIRECTORY' is invalid!");
         render.error(err, "The target backup directory does not exist. ", 
-                          "The 'PORTAINER_BACKUP_DIRECTORY' is not pointing to a valid directory on the filesystem. " + 
-                          "Please enture the backup directory or mount path exists.");
+                          "The 'PORTAINER_BACKUP_DIRECTORY' environment variable or " + 
+                          "'--directory' command line otion is not pointing to a valid " + 
+                          "directory on the filesystem. Please ensure the " + 
+                          "backup directory or mount path exists.  You can use the " + 
+                          "'PORTAINER_BACKUP_MKDIR' environment variable or '--mkdir' command line " + 
+                          "option to dynamically create directories if needed.");
         return reject(err);
     });
 }
@@ -798,50 +813,58 @@ function validateBackupPath(context){
 function validateBackupFile(context){
     return new Promise((resolve, reject) => {
         
-        render.write("Validating target backup file        ... ")
+        // build backup filename string with all tokenized substitutions replaced
+        context.results.backup.filename = Util.processSubstitutions(context.results.backup.filename);
+        
+        // construct complete backup file path using backup directory and backup filename
+        context.results.backup.file = path.resolve(context.results.backup.directory, context.results.backup.filename);
+
+        // validate now
+        render.write("Validating target backup file      : ")
 
         // if file does not exists, then there is no overwrite conflict
         if(context.config.dryRun && !fs.existsSync(context.results.backup.file)){
-            render.writeln(symbols.success + "  (DRY-RUN)");
+            render.writeln(`${symbols.success} DRYRUN ${figures.arrowRight} ${context.results.backup.filename}`);
             context.results.backup.status="dryrun";
             return resolve(context);
         }
 
         // if file does not exists, then there is no overwrite conflict
         if(!fs.existsSync(context.results.backup.file)){
-            render.writeln(symbols.success);
+            render.writeln(`${symbols.success} ${context.results.backup.filename}`);
             context.results.backup.status="ready";
             return resolve(context);
         }
 
         // if file overwrites are allowed and this is a dry-run, then skip this validation check
         if(context.config.backup.overwrite && context.config.dryRun) {
-            render.writeln(symbols.warning + "  (OVERWRITE; DRY-RUN)");
+            render.writeln(`${symbols.warning} DRYRUN ${figures.arrowRight} ${context.results.backup.filename}`);
             context.results.backup.status="dryrun";
             return resolve(context); 
         }
 
         // if dry-run is enabled, then skip this validation check
         if(context.config.dryRun) {
-            render.writeln(symbols.error + "  (DRY-RUN)");
+            render.writeln(`${symbols.error} DRYRUN ${figures.arrowRight} ${context.results.backup.filename}`);
             context.results.backup.status="dryrun";
             return resolve(context); 
         }
 
         // if file overwrites are allowed, then skip this validation check
         if(context.config.backup.overwrite) {
-            render.writeln(symbols.warning + "  (OVERWRITE)");
+            render.writeln(`${symbols.warning} OVERWRITE ${figures.arrowRight} ${context.results.backup.filename}`);
             context.results.backup.status="overwrite";
             context.results.backup.overwrite=true;
             return resolve(context); 
         }
 
         // if the file does already exist, then there is a conflict; error
-        render.writeln(symbols.error);
+        render.writeln(`${symbols.error} ${context.results.backup.filename}`);
         context.results.backup.status="already-exists";
         let err = new Error(`Backup file [${Util.wrapFilePath(context.results.backup.file, 30)}] already exists.`);
         render.error(err, "The target backup data file already exists!", 
-                          "Set the 'PORTAINER_BACKUP_OVERWRITE' environment varaiable to enable file overwriting.");
+                          "Set the 'PORTAINER_BACKUP_OVERWRITE' environment varaiable " + 
+                          "or '--overwrite' command line option to enable file overwriting.");
         return reject(err);
     });
 }
@@ -855,26 +878,29 @@ function validateBackupFile(context){
     return new Promise((resolve, reject) => {
 
         // validate portainer minimum supported version
-        render.write("Validating portainer version         ... ")
+        render.write("Validating portainer version       : ")
         if(compareSemVer(context.results.portainer.version, Portainer.MIN_VERSION) >= 0){
-            render.writeln(`${symbols.success}  (${context.results.portainer.version})`);
+            render.writeln(`${symbols.success} v${context.results.portainer.version}`);
             return resolve(context);
         }
 
         // the connected portainer server does not meet the minimum version requirements
         if(context.config.portainer.ignoreVersion){
-            render.writeln(`${symbols.warning}  (${context.results.portainer.version}) [UNSUPPORTED]`);
+            render.writeln(`${symbols.warning} v${context.results.portainer.version} [UNSUPPORTED]`);
             if(!context.config.concise) render.unsupportedVersion(context.results.portainer.version);
             return resolve(context);
         }
 
         // the connected portainer server does not meet the minimum version requirements
-        render.writeln(`${symbols.error} (${context.results.portainer.version})`);
+        render.writeln(`${symbols.error} v${context.results.portainer.version}`);
         if(!context.config.concise) render.unsupportedVersion(context.results.portainer.version);
         let err = new Error("The portainer server is older than the minimum supported version.");
         render.error(err, "The portainer server is older than the minimum supported version.", 
-                          `The portainer server is [${context.results.portainer.version}];  The minimum supported version is [${Portainer.MIN_VERSION}]. ` + 
-                          "Please upgrade your portainer server or use the 'PORTAINER_BACKUP_IGNORE_VERSION' option to override the version checking.");
+                          `The portainer server is [${context.results.portainer.version}];  "+ 
+                          "The minimum supported version is [${Portainer.MIN_VERSION}]. ` + 
+                          "Please upgrade your portainer server or use the 'PORTAINER_BACKUP_IGNORE_VERSION' " + 
+                          "environment variable or '--ignore-version' command line " + 
+                          "option to override the version checking.");
         return reject(err);
     });
 }
@@ -887,7 +913,7 @@ function validateBackupFile(context){
 function validateStackFiles(context){ 
     return new Promise((resolve, reject) => {
         let numberOfConflicts = 0;
-        render.writeln("Iterating stacks ... checking for file conflicts:")
+        render.writeln("Validate stack file conflicts      : ")
         render.writeln();
 
         // create new map collection for stacks (indexed by stack ID)
@@ -901,7 +927,7 @@ function validateStackFiles(context){
 
             // check for existing docker-compose file for this stack data
             const filename = sanitize(`${stack.Name}.docker-compose.yaml`);
-            const stackFile = path.resolve(context.config.backup.directory, filename)
+            const stackFile = path.resolve(context.results.backup.directory, filename)
 
             // assign stack file reference
             stack.file = stackFile;
@@ -916,11 +942,11 @@ function validateStackFiles(context){
                 status: "pending"
             };
 
-            render.write(` ${figures.arrowRight}  ${stackFile} ... `)            
+            render.write(`${figures.arrowRight}  ${stackFile} ... `)            
 
             // validate overwrite of existing file
             if(context.config.dryRun && !fs.existsSync(stackFile)){
-                render.writeln(`${symbols.success}  (DRY-RUN)`);
+                render.writeln(`${symbols.success}  (DRYRUN)`);
                 context.results.stacks[stack.Id].status = "dryrun";
             }
             else if(!fs.existsSync(stackFile)){
@@ -928,11 +954,11 @@ function validateStackFiles(context){
                 context.results.stacks[stack.Id].status = "pending";
             }
             else if (context.config.backup.overwrite && context.config.dryRun){
-                render.writeln(`${symbols.warning}  (OVERWRITE; DRY-RUN)`);
+                render.writeln(`${symbols.warning}  (OVERWRITE; DRYRUN)`);
                 context.results.stacks[stack.Id].status = "dryrun";
             }
             else if (context.config.dryRun){
-                render.writeln(`${symbols.error}  (DRY-RUN)`);
+                render.writeln(`${symbols.error}  (DRYRUN)`);
                 context.results.stacks[stack.Id].status = "dryrun";
             }
             else if (context.config.backup.overwrite){
@@ -942,7 +968,7 @@ function validateStackFiles(context){
             }
             else{
                 numberOfConflicts++;
-                render.writeln(symbols.err);
+                render.writeln(symbols.error);
                 context.results.stacks[stack.Id].status = "already-exists";
             }
         }                
@@ -951,7 +977,7 @@ function validateStackFiles(context){
         if(numberOfConflicts > 0){
             let err = new Error(`[${numberOfConflicts}] stack file(s) with the same name already exists in the target backup directory.`)
             render.error(err, "One or more target stack data files already exists!", 
-                              "Set the 'PORTAINER_BACKUP_OVERWRITE' environment varaiable to enable file overwriting.");            
+                              "Set the 'PORTAINER_BACKUP_OVERWRITE' environment varaiable or '--overwrite' command line option to enable file overwriting.");            
             return reject(err);
         }
 
@@ -975,10 +1001,10 @@ function validateStackFiles(context){
  * @returns Promise
  */
 function portainerStatusCheck(context){
-    render.write("Validating API access to portainer   ... ")     
+    render.write("Validating portainer server        : ")     
     return portainer.status()
         .then((data)=>{      // SUCCESS
-            render.writeln(symbols.success);
+            render.writeln(`${symbols.success} ${context.config.portainer.baseUrl}`);
             
             // display portainer server status
             if(!context.config.concise){
@@ -996,7 +1022,7 @@ function portainerStatusCheck(context){
             Promise.resolve(context);
         })
         .catch((err)=>{      // ERROR RETRIEVING PORTAINER STATUS
-            render.writeln(symbols.error);
+            render.writeln(`${symbols.error} ${context.config.portainer.baseUrl}`);
             render.error(err, "Connection to portainer server failed!");        
             return Promise.reject(err);
         })        
@@ -1009,7 +1035,7 @@ function portainerStatusCheck(context){
  * @returns Promise
  */
 function portainerBackupData(context){
-    render.write("Retrieving portainer data backup     ... ")
+    render.write("Retrieving portainer data backup   : ")
     return portainer.backup()
         .then((response)=>{
             render.writeln(symbols.success);
@@ -1038,7 +1064,7 @@ function portainerBackupData(context){
 function portainerSaveBackupData(context, response){
 
 
-    render.write("Saving portainer data backup         ... ")
+    render.write("Saving portainer data backup       : ")
     return portainer.saveBackup(response.data, context.results.backup.file)
         .then((file)=>{
             render.writeln(symbols.success);
@@ -1101,10 +1127,11 @@ function portainerBackupStacks(context){
  */
  function portainerAcquireStacks(context){ 
     // execute API call to get stacks from Portainer server
-    render.write("Acquiring portainer stacks metadata  ... ")
+    render.write("Acquiring portainer stacks catalog : ")
+
     return portainer.stacksMetadata()
         .then((stacks)=>{            
-            render.writeln(`${symbols.success} (${stacks.length})`);
+            render.writeln(`${symbols.success} ${stacks.length} STACKS`);
 
             // assign stacks array reference
             context.cache.stacks = stacks;
@@ -1135,14 +1162,14 @@ function portainerBackupStacks(context){
 function portainerBackupStackFiles(context){ 
 
     // iterate over stacks metadata and fetch each stack file
-    render.writeln("Iterating stacks ... download & save stack files:")
+    render.writeln("Downloading & save stack files     : ")
     render.writeln();
 
     // iterate over the stacks asynchronously 
     return Promise.all(context.cache.stacks.map(async (stack) => {
         return portainer.stackFile(stack.Id)
             .then((data)=>{
-                render.writeln(` ${figures.arrowRight}  saving (stack #${stack.Id}) [${stack.Name}.docker-compose.yml]  ...  ${symbols.success}`)
+                render.writeln(`${figures.arrowRight}  saving (stack #${stack.Id}) [${stack.Name}.docker-compose.yml]  ...  ${symbols.success}`)
 
                 // write docker-compose file for the stack data
                 fs.writeFileSync(stack.file, data.StackFileContent);
@@ -1153,14 +1180,14 @@ function portainerBackupStackFiles(context){
             })
             .catch(err=>{
                 context.results.stacks[stack.Id].status = "failed";
-                render.writeln(` ${figures.arrowRight}  saving (stack #${stack.Id}) [${stack.Name}.docker-compose.yml]  ...  ${symbols.error}`)
+                render.writeln(`${figures.arrowRight}  saving (stack #${stack.Id}) [${stack.Name}.docker-compose.yml]  ...  ${symbols.error}`)
                 render.error(err, `Portainer failed to save stack file: (stack #${stack.Id}) [${stack.Name}.docker-compose.yml]`);
                 Promise.reject(err);
             });
 
     })).then(()=>{
         render.writeln();
-        render.writeln("Saving stack files complete ... " + symbols.success);
+        render.writeln(`Saving stack files complete        : ${symbols.success} ${context.cache.stacks.length} STACK FILES`);
         render.writeln();
 
         // print listing table of stack files

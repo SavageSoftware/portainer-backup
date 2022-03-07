@@ -48,6 +48,7 @@ export class Configuration {
         this.quiet = Util.evalBool(process.env.PORTAINER_BACKUP_QUIET);
         this.json = Util.evalBool(process.env.PORTAINER_BACKUP_JSON);
         this.concise = Util.evalBool(process.env.PORTAINER_BACKUP_CONCISE);
+        this.mkdir = Util.evalBool(process.env.PORTAINER_BACKUP_MKDIR);
     }
 
     /**
@@ -74,6 +75,7 @@ export class Configuration {
         if(args.quiet)         this.quiet = Util.evalBool(args.quiet);
         if(args.json)          this.json = Util.evalBool(args.json);
         if(args.concise)       this.concise = Util.evalBool(args.concise);
+        if(args.mkdir)         this.mkdir = Util.evalBool(args.mkdir);
 
         // construct backup file path using backup directory and backup filename
         this.backup.file = path.resolve(this.backup.directory, this.backup.filename);
