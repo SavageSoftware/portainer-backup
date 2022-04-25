@@ -93,6 +93,11 @@ docker run -it --rm \
   backup
 ```
 
+Supported Docker platforms:
+  * `linux/amd64` (Intel/AMD x64)
+  * `linux/arm64` (ARMv8)
+  * `linux/arm` (ARMv7)
+
 ---
 
 ## Prerequisites
@@ -691,5 +696,10 @@ services:
 ```
 
 Just run the `docker-compose up -d` command in the same directory as your `docker-compose.yml` file to launch the container instance.
+
+Supported Docker platforms:
+  * `linux/amd64` (Intel/AMD x64)
+  * `linux/arm64` (ARMv8)
+  * `linux/arm` (ARMv7)
 
 ---

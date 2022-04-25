@@ -36,7 +36,7 @@ docker buildx create --driver-opt env.BUILDKIT_STEP_LOG_MAX_SIZE=10485760   \
 docker buildx build \
   --build-arg BUILDDATE="$(date -u +'%Y-%m-%dT%H:%M:%SZ')" \
   --build-arg VERSION="$VERSION"     \
-  --platform linux/amd64,linux/arm64 \
+  --platform linux/amd64,linux/arm64,linux/arm \
   --tag savagesoftware/portainer-backup:$VERSION \
   --tag savagesoftware/portainer-backup:latest   \
   . $@
