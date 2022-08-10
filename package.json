@@ -22,7 +22,7 @@
     },
     "engines": {
         "node": ">=16"
-    },    
+    },
     "license": "Apache",
     "main": "index.js",
     "type": "module",
@@ -54,6 +54,7 @@
         "pretty-bytes": "^6.0.0",
         "sanitize-filename": "^1.6.3",
         "semver-parser": "^4.0.1",
+        "uuid": "^8.3.2",
         "yargs": "^17.5.1"
     }
 }
