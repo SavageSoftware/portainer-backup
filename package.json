@@ -1,6 +1,6 @@
 {
     "name": "portainer-backup",
-    "version": "0.0.6",
+    "version": "0.0.7",
     "description": "Utility for scripting or scheduling scheduled backups for Portainer",
     "readme": "README.md",
     "keywords": [
@@ -40,20 +40,20 @@
         "restore": "node src/index.js restore"
     },
     "dependencies": {
-        "axios": "^0.26.0",
-        "cli-table3": "^0.6.1",
+        "axios": "^0.27.2",
+        "cli-table3": "^0.6.2",
         "colors": "^1.4.0",
         "death": "^1.1.0",
         "dev-null": "^0.1.1",
         "figlet": "^1.5.2",
-        "figures": "^4.0.0",
-        "gradient-string": "^2.0.0",
+        "figures": "^5.0.0",
+        "gradient-string": "^2.0.1",
         "log-symbols": "^5.1.0",
-        "luxon": "^2.3.1",
-        "node-cron": "^3.0.0",
+        "luxon": "^3.0.1",
+        "node-cron": "^3.0.1",
         "pretty-bytes": "^6.0.0",
         "sanitize-filename": "^1.6.3",
-        "semver-parser": "^4.0.0",
-        "yargs": "^17.3.1"
+        "semver-parser": "^4.0.1",
+        "yargs": "^17.5.1"
     }
 }
