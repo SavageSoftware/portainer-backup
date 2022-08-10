@@ -40,3 +40,7 @@ docker buildx build \
   --tag savagesoftware/portainer-backup:$VERSION \
   --tag savagesoftware/portainer-backup:latest   \
   . $@
+
+# if unable to build, you may need to remove builder
+# to allow script to re-create it using the following command:
+# docker buildx rm portainer-backup-builder
