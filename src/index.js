@@ -768,6 +768,10 @@ function validateBackupDirectory(context){
 
         let createdDirectory = false;
 
+        // copy configured backup directory path into results data structure
+        // (this will re-set the config for new substitutions if needed)
+        context.results.backup.directory = context.config.backup.directory;
+
         // replace substitution tokens in backup directory string if needed
         const pathParts = context.results.backup.directory.split(path.sep);
         for(let index in pathParts){
@@ -794,7 +798,7 @@ function validateBackupDirectory(context){
         let err = new Error("'PORTAINER_BACKUP_DIRECTORY' is invalid!");
         render.error(err, "The target backup directory does not exist. ", 
                           "The 'PORTAINER_BACKUP_DIRECTORY' environment variable or " + 
-                          "'--directory' command line otion is not pointing to a valid " + 
+                          "'--directory' command line option is not pointing to a valid " +
                           "directory on the filesystem. Please ensure the " + 
                           "backup directory or mount path exists.  You can use the " + 
                           "'PORTAINER_BACKUP_MKDIR' environment variable or '--mkdir' command line " + 
@@ -812,7 +816,11 @@ function validateBackupDirectory(context){
  */
 function validateBackupFile(context){
     return new Promise((resolve, reject) => {
-        
+
+        // copy configured backup file name into results data structure
+        // (this will re-set the config for new substitutions if needed)
+        context.results.backup.filename = context.config.backup.filename;
+
         // build backup filename string with all tokenized substitutions replaced
         context.results.backup.filename = Util.processSubstitutions(context.results.backup.filename);
         
