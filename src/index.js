@@ -695,6 +695,15 @@ function finish(err){
 }
 
 
+/**
+ * Builds stack filename from metadata
+ * @param {*} stack stack metadata
+ * @returns string
+ */
+function buildStackFilename(stack) {
+    let endpointId = stack.EndpointId.toString();
+    return sanitize(`${endpointId}_${stack.Name}.docker-compose.yaml`);
+}
 
 // ********************************************************************************************************
 // ********************************************************************************************************
@@ -934,7 +943,7 @@ function validateStackFiles(context){
             let stack = context.cache.stacks[index];
 
             // check for existing docker-compose file for this stack data
-            const filename = sanitize(`${stack.Name}.docker-compose.yaml`);
+            const filename = buildStackFilename(stack);
             const stackFile = path.resolve(context.results.backup.directory, filename)
 
             // assign stack file reference
@@ -1175,9 +1184,10 @@ function portainerBackupStackFiles(context){
 
     // iterate over the stacks asynchronously 
     return Promise.all(context.cache.stacks.map(async (stack) => {
+        let stackFilename = buildStackFilename(stack);
         return portainer.stackFile(stack.Id)
             .then((data)=>{
-                render.writeln(`${figures.arrowRight}  saving (stack #${stack.Id}) [${stack.Name}.docker-compose.yml]  ...  ${symbols.success}`)
+                render.writeln(`${figures.arrowRight}  saving (stack #${stack.Id}) [${stackFilename}]  ...  ${symbols.success}`)
 
                 // write docker-compose file for the stack data
                 fs.writeFileSync(stack.file, data.StackFileContent);
@@ -1188,8 +1198,8 @@ function portainerBackupStackFiles(context){
             })
             .catch(err=>{
                 context.results.stacks[stack.Id].status = "failed";
-                render.writeln(`${figures.arrowRight}  saving (stack #${stack.Id}) [${stack.Name}.docker-compose.yml]  ...  ${symbols.error}`)
-                render.error(err, `Portainer failed to save stack file: (stack #${stack.Id}) [${stack.Name}.docker-compose.yml]`);
+                render.writeln(`${figures.arrowRight}  saving (stack #${stack.Id}) [${stackFilename}]  ...  ${symbols.error}`)
+                render.error(err, `Portainer failed to save stack file: (stack #${stack.Id}) [${stackFilename}]`);
                 Promise.reject(err);
             });
 
