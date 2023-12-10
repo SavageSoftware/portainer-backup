@@ -21,6 +21,7 @@
 #       COPYRIGHT SAVAGESOFTWARE,LLC, @ 2022, ALL RIGHTS RESERVED
 # *********************************************************************
 FROM node:lts-alpine
+RUN apk update && apk add --no-cache tzdata
 
 # IMAGE ARGUMENTS PASSED IN FROM BUILDER
 ARG TARGETARCH
@@ -31,27 +32,14 @@ ARG BUILDVERSION
 LABEL "com.example.vendor"="ACME Incorporated"
 LABEL vendor="Savage Software, LLC"
 LABEL maintainer="Robert Savage"
-LABEL version="$VERSION"
 LABEL description="Utility for scripting or scheduling scheduled backups for Portainer"
 LABEL url="https://github.com/SavageSoftware/portainer-backup"
-LABEL org.label-schema.schema-version="$VERSION"
-LABEL org.label-schema.build-date="$BUILDDATE"
 LABEL org.label-schema.name="savagesoftware/portainer-backup"
 LABEL org.label-schema.description="Utility for scripting or scheduling scheduled backups for Portainer"
 LABEL org.label-schema.url="https://github.com/SavageSoftware/portainer-backup"
 LABEL org.label-schema.vcs-url="https://github.com/SavageSoftware/portainer-backup.git"
 LABEL org.label-schema.vendor="Savage Software, LLC"
-LABEL org.label-schema.version=$VERSION
 LABEL org.label-schema.docker.cmd="docker run -it --rm --name portainer-backup --volume $PWD/backup:/backup savagesoftware/portainer-backup:latest backup"
-
-# INSTALL ADDITIONAL IMAGE DEPENDENCIES AND COPY APPLICATION TO IMAGE
-RUN apk update && apk add --no-cache tzdata
-RUN mkdir -p /portainer-backup/src
-COPY package.json /portainer-backup
-COPY src/*.js /portainer-backup/src
-WORKDIR /portainer-backup
-VOLUME "/backup"
-RUN npm install --silent
 
 # DEFAULT ENV VARIABLE VALUES
 ENV TZ="America/New_York" 
@@ -70,3 +58,19 @@ ENTRYPOINT [ "/usr/local/bin/node", "/portainer-backup/src/index.js" ]
 
 # DEFAULT COMMAND (if none provided)
 CMD ["schedule"]
+
+VOLUME "/backup"
+
+# PROVIDE IMAGE VERSION UNFORMATION
+LABEL version="$VERSION"
+LABEL org.label-schema.schema-version="$VERSION"
+LABEL org.label-schema.version=$VERSION
+
+# INSTALL ADDITIONAL IMAGE DEPENDENCIES AND COPY APPLICATION TO IMAGE
+WORKDIR /portainer-backup
+COPY package.json /portainer-backup/package.json
+RUN npm install --silent
+
+COPY src/*.js /portainer-backup/src/
+
+LABEL org.label-schema.build-date="$BUILDDATE"
